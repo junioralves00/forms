@@ -45,8 +45,7 @@
 
       <div class="form-group col-md-6">
         <label for="complemento" class="control-label">Complemento</label>
-        <input type="text" class="form-control" id="complemento" name="complemento"
-          formControlName="endereco.complemento">
+        <input type="text" class="form-control" id="complemento" name="complemento" formControlName="complemento">
       </div>
 
     </div>
@@ -58,7 +57,7 @@
       </div>
 
       <div class="col-sm-12">
-        <input type="text" class="form-control" name="rua" id="rua" formControlName="endereco.rua">
+        <input type="text" class="form-control" id="rua" formControlName="rua">
 
         <app-campo-control-erro [mostrarErro]="verificaValidTouched('endereco.rua')" msgErro="Rua é obrigatório.">
         </app-campo-control-erro>
