@@ -1,11 +1,15 @@
-
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
 
 import { DropdownService } from './../shared/services/dropdown.service';
 import { EstadoBr } from '../shared/models/estado-br.model';
+import { ConsultaCepService } from './../shared/services/consulta-cep.service';
+import { Observable } from 'rxjs';
+
+
 @Component({
   selector: 'app-data-form',
   templateUrl: './data-form.component.html',
@@ -14,21 +18,25 @@ import { EstadoBr } from '../shared/models/estado-br.model';
 export class DataFormComponent implements OnInit {
 
   formulario: FormGroup;
-  estados: EstadoBr[];
+  //estados: EstadoBr[];
+  estados: Observable<EstadoBr[]>;
 
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
-    private dropdownService: DropdownService
+    private dropdownService: DropdownService,
+    private cepService: ConsultaCepService
   ) { }
 
   ngOnInit(): void {
 
-    this.dropdownService.getEstadosBr()
+    this.estados = this.dropdownService.getEstadosBr();
+
+    /*this.dropdownService.getEstadosBr()
       .subscribe((dados: EstadoBr[]) => {
         this.estados = dados;
       });
-    /*this.formulario = new FormGroup({
+    this.formulario = new FormGroup({
       nome: new FormControl(null),
       email: new FormControl(null)
     });*/
@@ -102,25 +110,12 @@ export class DataFormComponent implements OnInit {
   }
   consultaCEP() {
 
-    let cep = this.formulario.get('endereco.cep').value
-    //Nova variável "cep" somente com dígitos.
-    cep = cep.replace(/\D/g, '');
+    const cep = this.formulario.get('endereco.cep').value
 
-    //Verifica se campo cep possui valor informado.
-    if (cep != "") {
+    if (cep != null && cep !== '') {
 
-      //Expressão regular para validar o CEP.
-      var validacep = /^[0-9]{8}$/;
-
-      //Valida o formato do CEP.
-      if (validacep.test(cep)) {
-
-        this.resetaDadosForm();
-
-        this.http.get(`//viacep.com.br/ws/${cep}/json`)
-          .pipe(map(dados => dados))
-          .subscribe(dados => this.populaDadosForm(dados));
-      }
+      this.cepService.consultaCEP(cep)
+        .subscribe(dados => this.populaDadosForm(dados));
     }
   }
 
