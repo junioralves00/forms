@@ -72,8 +72,11 @@ export class DataFormComponent implements OnInit {
       termos: [null, Validators.requiredTrue],
       frameworks: this.buildFrameworks()
     });
+
+
   }
   //[null, Validators.required, Validators.minLength(3), Validators.maxLength(20)]
+
 
   buildFrameworks() {
 
