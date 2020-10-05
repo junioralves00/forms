@@ -1,9 +1,9 @@
 import { VerificaEmailService } from './services/verifica-email.service';
-import { map } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { empty, Observable } from 'rxjs';
 
 import { DropdownService } from './../shared/services/dropdown.service';
 import { EstadoBr } from '../shared/models/estado-br.model';
@@ -72,6 +72,16 @@ export class DataFormComponent implements OnInit {
       termos: [null, Validators.requiredTrue],
       frameworks: this.buildFrameworks()
     });
+
+    this.formulario.get('endereco.cep').statusChanges
+    .pipe(
+      distinctUntilChanged(),
+      tap(value =>console.log('valor do CEP:', value)),
+      switchMap(status => status === 'VALID' ?
+        this.cepService.consultaCEP(this.formulario.get('endereco.cep').value) : empty()
+      )
+    )
+    .subscribe( dados => dados ?  this.populaDadosForm(dados) : {});
 
 
   }
